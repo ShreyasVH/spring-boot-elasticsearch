@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.example.demo.models.BookIndex;
 import com.example.demo.repositories.BookRepository;
@@ -22,6 +23,9 @@ public class ElasticService {
 
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
+
+    @Autowired
+    private ElasticsearchClient elasticsearchClient;
 
     public BookIndex get(String id) {
         return bookRepository.findById(id).orElse(null);
@@ -49,6 +53,8 @@ public class ElasticService {
     }
 
     public <T> List<T> search(Query query, Class<T> documentClass) {
+//        elasticsearchClient.search();
+
         SearchHits<T> searchHits = elasticsearchOperations.search(query, documentClass);
 
         return searchHits.getSearchHits().stream().map(SearchHit::getContent).collect(Collectors.toList());
