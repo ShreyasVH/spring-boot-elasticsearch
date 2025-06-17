@@ -1,0 +1,15 @@
+# maven 3.8.8 path
+export PATH=
+
+# java 17.0.7 path
+export PATH=
+
+export PORT=
+
+export ELASTIC_IP_HTTP=
+export ELASTIC_PORT_HTTP=
+export ELASTIC_SCHEME=
+export ELASTIC_USE_CREDENTIALS=
+export ELASTIC_USERNAME=
+export ELASTIC_PASSWORD=
+export ELASTIC_INDEX_BOOKS=

@@ -24,33 +24,39 @@ public class IndexController
     @Autowired
     private ElasticService elasticService;
 
-    @GetMapping("/books/{id}")
+    @GetMapping("/v1/books/{id}")
     public BookIndex get(@PathVariable(value = "id") String id)
     {
         return elasticService.get(id);
     }
 
-    @PostMapping("/books")
+    @GetMapping("/v1/books")
+    public List<BookIndex> list()
+    {
+        return elasticService.getAll(BookIndex.class);
+    }
+
+    @PostMapping("/v1/books")
     public BookIndex post(@RequestBody BookRequest request)
     {
         String id = UUID.randomUUID().toString();
         return elasticService.save(new BookIndex(id, request.getName(), request.getAuthor()));
     }
 
-    @PutMapping("/books/{id}")
+    @PutMapping("/v1/books/{id}")
     public BookIndex put(@PathVariable String id, @RequestBody BookRequest request)
     {
         return elasticService.update(id, request);
     }
 
-    @DeleteMapping("/books/{id}")
+    @DeleteMapping("/v1/books/{id}")
     public String delete(@PathVariable(value = "id") String id)
     {
         elasticService.delete(id);
         return "DELETE REQUEST";
     }
 
-    @GetMapping("/books/author")
+    @GetMapping("/v1/books/author")
     public List<BookIndex> getByAuthor(@RequestParam String author) {
         BoolQuery.Builder query = QueryBuilders.bool();
 

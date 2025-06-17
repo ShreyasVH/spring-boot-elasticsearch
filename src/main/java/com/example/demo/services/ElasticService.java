@@ -1,10 +1,13 @@
 package com.example.demo.services;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.example.demo.models.BookIndex;
 import com.example.demo.repositories.BookRepository;
 import com.example.demo.requests.BookRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -50,6 +53,15 @@ public class ElasticService {
 
     public <T> List<T> search(Query query, Class<T> documentClass) {
         SearchHits<T> searchHits = elasticsearchOperations.search(query, documentClass);
+
+        return searchHits.getSearchHits().stream().map(SearchHit::getContent).collect(Collectors.toList());
+    }
+
+    public <T> List<T> getAll(Class<T> documentClass) {
+        BoolQuery.Builder query = QueryBuilders.bool();
+        Query request = NativeQuery.builder()
+                .withQuery(query.build()._toQuery()).build();
+        SearchHits<T> searchHits = elasticsearchOperations.search(request, documentClass);
 
         return searchHits.getSearchHits().stream().map(SearchHit::getContent).collect(Collectors.toList());
     }

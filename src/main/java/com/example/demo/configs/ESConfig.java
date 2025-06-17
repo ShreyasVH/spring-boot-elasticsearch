@@ -1,42 +1,48 @@
 package com.example.demo.configs;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
-import org.springframework.data.elasticsearch.client.erhlc.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.client.erhlc.RestClients;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-//@EnableElasticsearchRepositories(basePackages = "com.example.demo.repositories")
-//@ComponentScan(basePackages = { "com.example.demo.services" })
 public class ESConfig extends ElasticsearchConfiguration {
-//    @Bean
-//    public RestHighLevelClient client() {
-//        ElasticsearchClient
-//
-//        ClientConfiguration clientConfiguration
-//                = ClientConfiguration.builder()
-//                .connectedTo("localhost:9200")
-//                .build();
-//
-//        return RestClients.create(clientConfiguration).rest();
-//    }
-//
-//    @Bean
-//    public ElasticsearchOperations elasticsearchTemplate() {
-//        return new ElasticsearchRestTemplate(client());
-//    }
+    @Value("${elasticsearch.host}")
+    private String elasticsearchHost;
+
+    @Value("${elasticsearch.port}")
+    private String elasticsearchPort;
+
+    @Value("${elasticsearch.username}")
+    private String elasticsearchUsername;
+
+    @Value("${elasticsearch.password}")
+    private String elasticsearchPassword;
+
+    @Value("${elasticsearch.scheme}")
+    private String elasticsearchScheme;
+
+    @Value("${elasticsearch.use.credentials}")
+    private String elasticsearchUseCredentials;
 
     @Override
     public ClientConfiguration clientConfiguration() {
-        return ClientConfiguration.builder()
-                .connectedTo("localhost:9200")
-                .withBasicAuth("elastic", "password")
+        ClientConfiguration.MaybeSecureClientConfigurationBuilder secureBuilder = ClientConfiguration.builder()
+                .connectedTo( elasticsearchHost + ":" + elasticsearchPort);
+
+        if("https".equals(elasticsearchScheme))
+        {
+            secureBuilder.usingSsl();
+        }
+
+        ClientConfiguration.TerminalClientConfigurationBuilder builder = secureBuilder;
+
+        if("1".equals(elasticsearchUseCredentials))
+        {
+            builder = builder.withBasicAuth(elasticsearchUsername, elasticsearchPassword);
+        }
+
+        return builder
                 .build();
     }
 }

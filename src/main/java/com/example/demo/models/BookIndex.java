@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "books")
+@Document(indexName = "book_store_springboot")
 public class BookIndex {
     private String id;
     private String name;
