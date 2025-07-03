@@ -7,6 +7,7 @@ import com.example.demo.models.BookIndex;
 import com.example.demo.repositories.BookRepository;
 import com.example.demo.requests.BookRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -14,6 +15,7 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,11 +60,18 @@ public class ElasticService {
     }
 
     public <T> List<T> getAll(Class<T> documentClass) {
-        BoolQuery.Builder query = QueryBuilders.bool();
-        Query request = NativeQuery.builder()
-                .withQuery(query.build()._toQuery()).build();
-        SearchHits<T> searchHits = elasticsearchOperations.search(request, documentClass);
+        List<T> list = new ArrayList<>();
+        try
+        {
+            BoolQuery.Builder query = QueryBuilders.bool();
+            Query request = NativeQuery.builder()
+                    .withQuery(query.build()._toQuery()).build().setPageable(PageRequest.ofSize(1000));
+            SearchHits<T> searchHits = elasticsearchOperations.search(request, documentClass);
 
-        return searchHits.getSearchHits().stream().map(SearchHit::getContent).collect(Collectors.toList());
+            list = searchHits.getSearchHits().stream().map(SearchHit::getContent).collect(Collectors.toList());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
     }
 }
